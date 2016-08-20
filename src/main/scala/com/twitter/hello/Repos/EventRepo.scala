@@ -2,12 +2,15 @@ package com.twitter.hello.Repos
 
 import java.util.concurrent.TimeUnit
 
-import com.mongodb.client.model.Filters
+import com.mongodb.client.model.{Filters, UpdateOptions}
+import com.twitter.finagle.http.Request
 import com.twitter.hello.JsonUtil
 import com.twitter.hello.Response.EventResponse
 import org.mongodb.scala._
 import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.UpdateOptions
 import org.mongodb.scala.result.UpdateResult
+import org.mongodb.scala.model.Updates._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -69,18 +72,49 @@ class EventRepo {
 
     result match {
       case Success(t) => true
-      case Failure(e) => {println(e);false}
+      case Failure(e) => { println(e); false }
     }
-    // Explictly subscribe:
-//    observable.subscribe(new Observer[Completed] {
-//
-//      override def onNext(result: Completed): Unit =
-//        println(request + " Inserted")
-//
-//      override def onError(e: Throwable): Unit = println(request + " Failed")
-//
-//      override def onComplete(): Unit = println(request + " Completed")
-//    })
+  }
+
+  def updateDocEither(request: String): Either[Throwable, Document] = {
+    println("updateDocEither, request=" + request)
+    val doc: Document = Document(request)
+
+    val eventId = doc.get("event_id").get.asString().getValue
+
+    val observable: Observable[UpdateResult] =
+      collection.updateOne(Filters.eq("event_id", eventId), doc)
+
+    val result =
+      Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
+
+    result match {
+      case Success(t) =>
+        getDocumentById(eventId) match {
+          case Right(o) => Right(o)
+          case Left(x) => Left(x)
+        }
+      case Failure(e) => Left(e)
+    }
+
+  }
+
+  def updateBson(request: UpdateBsonId): Either[Throwable, Document] = {
+    println("updateBson, request=" + request)
+    val eventId = request.event_id
+    val observable: Observable[UpdateResult] =
+      collection.updateOne(Filters.eq("event_id", eventId), request.criteria)
+    val result =
+      Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
+
+    result match {
+      case Success(t) =>
+        getDocumentById(eventId) match {
+          case Right(o) => Right(o)
+          case Left(x) => Left(x)
+        }
+      case Failure(e) => Left(e)
+    }
   }
 
   def getJsonById(id: String): Either[Throwable, String] = {
@@ -98,7 +132,7 @@ class EventRepo {
     val result =
       Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
     result match {
-      case Success(t) => Right(t)
+      case Success(t) => {println("getDocumentById doc=" + t.toJson());Right(t)}
       case Failure(e) => Left(e)
     }
   }

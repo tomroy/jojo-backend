@@ -5,13 +5,14 @@ import javax.inject.Inject
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.hello.Repos.EventRepo
-import com.twitter.hello.Request.{AddRequest, EditRequest, LoginRequest}
-import com.twitter.hello.Service.{AddService, EditService, GetService, LoginService}
+import com.twitter.hello.Request.{AddRequest, EditRequest, LoginRequest, VoteRequest}
+import com.twitter.hello.Service._
 
 class HelloWorldController @Inject()(addService: AddService,
                                      getService: GetService,
                                      loginService: LoginService,
                                      editService: EditService,
+                                     voteService: VoteService,
                                      eventRepo: EventRepo)
     extends Controller {
 
@@ -51,6 +52,13 @@ class HelloWorldController @Inject()(addService: AddService,
     editService.insert(request) match {
       case true => response.ok()
       case false => response.badRequest("update error")
+    }
+  }
+
+  post("/event/vote") { request: VoteRequest =>
+    voteService.insert(request) match {
+      case Right(t) => t
+      case Left(e) => response.badRequest(e.getMessage)
     }
   }
 
