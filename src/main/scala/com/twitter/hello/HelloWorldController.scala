@@ -1,9 +1,15 @@
 package com.twitter.hello
 
+import javax.inject.Inject
+
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+import com.twitter.hello.Repos.EventRepo
+import com.twitter.hello.Service.AddService
 
-class HelloWorldController extends Controller {
+class HelloWorldController @Inject()(addService: AddService,
+                                     eventRepo: EventRepo)
+    extends Controller {
 
   get("/hi") { request: Request =>
     info("hi")
@@ -15,6 +21,10 @@ class HelloWorldController extends Controller {
   }
 
   post("/event/add") { request: AddRequest =>
-   request
+    addService.insert(request)
+  }
+
+  get("/insert") { request: Request =>
+    eventRepo.insert(request)
   }
 }
