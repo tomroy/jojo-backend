@@ -1,7 +1,7 @@
 package com.twitter.hello.Service
 
 import com.google.inject.Inject
-import com.twitter.hello.JsonUtil}
+import com.twitter.hello.JsonUtil
 import com.twitter.hello.Repos.EventRepo
 import com.twitter.hello.Request.AddRequest
 import com.twitter.hello.Response.AddResponse
