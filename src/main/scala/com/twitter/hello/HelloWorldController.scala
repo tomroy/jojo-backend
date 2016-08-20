@@ -24,7 +24,4 @@ class HelloWorldController @Inject()(addService: AddService,
     addService.insert(request)
   }
 
-  get("/insert") { request: Request =>
-    eventRepo.insert(request)
-  }
 }
