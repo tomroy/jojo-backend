@@ -2,10 +2,12 @@ package com.twitter.hello.Repos
 
 import java.util.concurrent.TimeUnit
 
+import com.mongodb.client.model.Filters
 import com.twitter.hello.JsonUtil
 import com.twitter.hello.Response.EventResponse
 import org.mongodb.scala._
 import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.result.UpdateResult
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -54,27 +56,57 @@ class EventRepo {
     })
   }
 
-  def getJsonById(id: String): Either[Throwable ,String] = {
+  def updateDoc(request: String): Boolean = {
+
+    val doc: Document = Document(request)
+
+    val observable: Observable[UpdateResult] = collection.replaceOne(
+        Filters.eq("event_id", doc.get("event_id").get.asString().getValue),
+        doc)
+
+    val result =
+      Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
+
+    result match {
+      case Success(t) => true
+      case Failure(e) => {println(e);false}
+    }
+    // Explictly subscribe:
+//    observable.subscribe(new Observer[Completed] {
+//
+//      override def onNext(result: Completed): Unit =
+//        println(request + " Inserted")
+//
+//      override def onError(e: Throwable): Unit = println(request + " Failed")
+//
+//      override def onComplete(): Unit = println(request + " Completed")
+//    })
+  }
+
+  def getJsonById(id: String): Either[Throwable, String] = {
     val observable = collection.find(equal("event_id", id)).first()
-    val result = Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
+    val result =
+      Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
     result match {
       case Success(t) => Right(t.toJson())
       case Failure(e) => Left(e)
     }
   }
 
-  def getDocumentById(id: String): Either[Throwable ,Document] = {
+  def getDocumentById(id: String): Either[Throwable, Document] = {
     val observable = collection.find(equal("event_id", id)).first()
-    val result = Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
+    val result =
+      Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
     result match {
       case Success(t) => Right(t)
       case Failure(e) => Left(e)
     }
   }
 
-  def get(id: String): Either[Throwable ,EventResponse] = {
+  def get(id: String): Either[Throwable, EventResponse] = {
     val observable = collection.find(equal("event_id", id)).first()
-    val result = Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
+    val result =
+      Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
     result match {
       case Success(t) => Right(JsonUtil.fromJson[EventResponse](t.toJson()))
       case Failure(e) => Left(e)
