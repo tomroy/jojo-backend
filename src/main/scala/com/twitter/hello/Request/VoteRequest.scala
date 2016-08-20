@@ -1,4 +1,6 @@
-package com.twitter.hello
+package com.twitter.hello.Request
+
+import com.twitter.hello.UserVote
 
 /**
   * Created by ChuHsuan on 2016/8/20.

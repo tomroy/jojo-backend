@@ -1,7 +1,7 @@
 package com.twitter.hello.Service
 
 import com.twitter.finagle.http.Request
-import com.twitter.hello.AddRequest
+import com.twitter.hello.Request.AddRequest
 import com.twitter.hello.Response.AddResponse
 
 /**

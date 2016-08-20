@@ -5,7 +5,7 @@ import com.mongodb.ServerAddress
 import com.mongodb.connection.ClusterSettings
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.Request
-import com.twitter.hello.AddRequest
+import com.twitter.hello.Request.AddRequest
 import com.twitter.util.Future
 import org.mongodb.scala._
 

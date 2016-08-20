@@ -5,6 +5,7 @@ import javax.inject.Inject
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.hello.Repos.EventRepo
+import com.twitter.hello.Request.AddRequest
 import com.twitter.hello.Service.AddService
 
 class HelloWorldController @Inject()(addService: AddService,
