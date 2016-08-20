@@ -13,4 +13,8 @@ class HelloWorldController extends Controller {
   post("/hi") { hiRequest: HiRequest =>
     "Hello " + hiRequest.name + " with id " + hiRequest.id
   }
+
+  post("/event/add") { request: AddRequest =>
+    response.notFound("name=" + request.name + " is not found!")
+  }
 }
