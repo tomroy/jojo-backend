@@ -8,5 +8,6 @@ import com.twitter.hello.{PollOption, UserVote}
 case class VoteRequest(
     event_id: String,
     user_name: String,
-    user_sel: List[Int]
+    user_sel: List[Int],
+    opt: List[PollOption]
 )
