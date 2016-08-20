@@ -13,7 +13,7 @@ class HelloWorldServer extends HttpServer {
 
   override def configureHttp(router: HttpRouter) {
     router
-      .filter(new HttpFilter(Cors.UnsafePermissivePolicy), true)
+      .filter(new HttpFilter(Cors.UnsafePermissivePolicy), beforeRouting = true)
       .filter[LoggingMDCFilter[Request, Response]]
       .filter[TraceIdMDCFilter[Request, Response]]
       .filter[CommonFilters]
