@@ -5,10 +5,12 @@ import javax.inject.Inject
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.hello.Repos.EventRepo
-import com.twitter.hello.Request.AddRequest
-import com.twitter.hello.Service.AddService
+import com.twitter.hello.Request.{AddRequest, LoginRequest}
+import com.twitter.hello.Service.{AddService, GetService, LoginService}
 
 class HelloWorldController @Inject()(addService: AddService,
+                                     getService: GetService,
+                                     loginService: LoginService,
                                      eventRepo: EventRepo)
     extends Controller {
 
@@ -23,6 +25,25 @@ class HelloWorldController @Inject()(addService: AddService,
 
   post("/event/add") { request: AddRequest =>
     addService.insert(request)
+  }
+
+  get("/event/get") { request: Request =>
+    val id = request.params.getOrElse("id", "unknown")
+    id match {
+      case "unknown" => response.badRequest("unknown uuid")
+      case _ =>
+        getService.get(id) match {
+          case Right(t) => t
+          case Left(e) => response.badRequest(s"${id} not found")
+        }
+    }
+  }
+
+  post("/event/login") { request: LoginRequest =>
+    loginService.login(request) match {
+      case true => response.ok()
+      case false => response.badRequest("invalid password")
+    }
   }
 
 }

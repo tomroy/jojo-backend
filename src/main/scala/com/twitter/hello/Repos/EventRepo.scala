@@ -1,7 +1,15 @@
 package com.twitter.hello.Repos
 
-import com.twitter.hello.Response.AddResponse
+import java.util.concurrent.TimeUnit
+
+import com.twitter.hello.JsonUtil
+import com.twitter.hello.Response.EventResponse
 import org.mongodb.scala._
+import org.mongodb.scala.model.Filters._
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success}
 
 /**
   * Created by tom_th_lin on 2016/8/20.
@@ -37,11 +45,46 @@ class EventRepo {
     // Explictly subscribe:
     observable.subscribe(new Observer[Completed] {
 
-      override def onNext(result: Completed): Unit = println(request + " Inserted")
+      override def onNext(result: Completed): Unit =
+        println(request + " Inserted")
 
       override def onError(e: Throwable): Unit = println(request + " Failed")
 
       override def onComplete(): Unit = println(request + " Completed")
     })
+  }
+
+  def getJsonById(id: String): Either[Throwable ,String] = {
+    val observable = collection.find(equal("event_id", id)).first()
+    val result = Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
+    result match {
+      case Success(t) => Right(t.toJson())
+      case Failure(e) => Left(e)
+    }
+  }
+
+  def getDocumentById(id: String): Either[Throwable ,Document] = {
+    val observable = collection.find(equal("event_id", id)).first()
+    val result = Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
+    result match {
+      case Success(t) => Right(t)
+      case Failure(e) => Left(e)
+    }
+  }
+
+  def get(id: String): Either[Throwable ,EventResponse] = {
+    val observable = collection.find(equal("event_id", id)).first()
+    val result = Await.ready(observable.head(), Duration(3, TimeUnit.SECONDS)).value.get
+    result match {
+      case Success(t) => Right(JsonUtil.fromJson[EventResponse](t.toJson()))
+      case Failure(e) => Left(e)
+    }
+//    val response: EventResponse = {
+
+//    }
+    // Subscribe with custom onNext and onError
+//    observable.subscribe((result: Document) => JsonUtil.fromJson[EventResponse](result.toJson()),
+//                         (e: Throwable) => println(s"There was an error: $e"))
+
   }
 }
