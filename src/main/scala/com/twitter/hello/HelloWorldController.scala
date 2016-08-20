@@ -15,6 +15,6 @@ class HelloWorldController extends Controller {
   }
 
   post("/event/add") { request: AddRequest =>
-    response.notFound("name=" + request.name + " is not found!")
+   request
   }
 }
