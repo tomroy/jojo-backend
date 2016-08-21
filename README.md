@@ -21,9 +21,9 @@ $ sbt run
 * Then browse to: [http://localhost:8888/hi?name=foo](http://localhost:8888/hi?name=foo)
 * Or view the [twitter-server admin interface](https://twitter.github.io/twitter-server/Features.html#admin-http-interface): [http://localhost:9990/admin](http://localhost:9990/admin)
 * To Check if the server is up and running.
-```
 
 ###Maven###
+
 ```
 mvn clean install
 ```
