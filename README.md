@@ -5,6 +5,7 @@
 * frontend repo [https://github.com/6chinwei/jojo-frontend](https://github.com/6chinwei/jojo-frontend)
 
 ## Prerequisites
+- java8
 - sbt
 - mongoDB
 
@@ -25,5 +26,5 @@ $ sbt run
 ###Maven###
 
 ```
-mvn clean install
+$ mvn clean install
 ```
